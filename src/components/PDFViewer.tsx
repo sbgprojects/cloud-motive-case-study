@@ -23,7 +23,7 @@ const PDFViewer = forwardRef<PDFViewerHandle, PDFViewerProps>(({
 }, ref) => {
   const [numPages, setNumPages] = useState<number>(0);
   const [scale, setScale] = useState<number>(1.0);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  // Loading state is handled by react-pdf's loading prop
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Expose the highlightText method via ref
@@ -70,7 +70,8 @@ const PDFViewer = forwardRef<PDFViewerHandle, PDFViewerProps>(({
 
       // Scroll to the first match if found
       if (firstMatch) {
-        firstMatch.scrollIntoView({
+        const element = firstMatch as HTMLElement;
+        element.scrollIntoView({
           behavior: 'smooth',
           block: 'center'
         });
@@ -82,7 +83,6 @@ const PDFViewer = forwardRef<PDFViewerHandle, PDFViewerProps>(({
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
-    setIsLoading(false);
   };
 
   const zoomIn = () => setScale(prev => Math.min(prev + 0.1, 2.0));
@@ -122,7 +122,7 @@ const PDFViewer = forwardRef<PDFViewerHandle, PDFViewerProps>(({
       <div 
         ref={containerRef} 
         className="pdf-container overflow-y-auto"
-        style={{ height: 'calc(100vh - 128px)' }}
+        style={{ height: 'calc(100vh - 160px)' }}
       >
         <Document
           file={file}
@@ -139,7 +139,7 @@ const PDFViewer = forwardRef<PDFViewerHandle, PDFViewerProps>(({
           }
         >
           {Array.from({ length: numPages }, (_, index) => (
-            <div key={`page_${index + 1}`} className="mb-4">
+            <div key={`page_${index + 1}`}>
               <Page
                 pageNumber={index + 1}
                 scale={scale}
